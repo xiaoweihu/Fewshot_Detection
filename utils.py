@@ -18,7 +18,9 @@ def softmax(x):
     x = x/x.sum()
     return x
 
-def bbox_iou(box1, box2, x1y1x2y2=True):
+def bbox_iou(box1_, box2_, x1y1x2y2=True):
+    box1 = [float(b) for b in box1_]
+    box2 = [float(b) for b in box2_]
     if x1y1x2y2:
         mx = min(box1[0], box2[0])
         Mx = max(box1[2], box2[2])
