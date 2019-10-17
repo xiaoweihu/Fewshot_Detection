@@ -413,7 +413,8 @@ def load_conv(buf, start, conv_model):
     if conv_model.bias is not None:
         num_b = conv_model.bias.numel()
         conv_model.bias.data.copy_(torch.from_numpy(buf[start:start+num_b]));   start = start + num_b
-    conv_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w])); start = start + num_w
+    conv_w_shape = conv_model.weight.data.shape
+    conv_model.weight.data.copy_(torch.from_numpy(buf[start:start+num_w]).view(conv_w_shape)); start = start + num_w
     return start
 
 def load_convfromcoco(buf, start, conv_model):

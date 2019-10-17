@@ -245,7 +245,7 @@ def voc_eval(detpath,
 
 def _do_python_eval(res_prefix, novel=False, output_dir = 'output'):
     # _devkit_path = '/data2/bykang/pytorch-yolo2/VOCdevkit'
-    _devkit_path = '/tmp_scratch/basilisk/bykang/datasets/VOCdevkit'
+    _devkit_path = 'fewshot_data/VOCdevkit'
     _year = '2007'
     _classes = ('__background__', # always index 0
         'aeroplane', 'bicycle', 'bird', 'boat',
@@ -340,6 +340,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     args.novel = True
     print(args.res_prefix)
-    _do_python_eval(args.res_prefix, novel=args.novel, output_dir = 'output')
+    output_dir = os.path.join(os.path.dirname(args.res_prefix), 'output')
+    _do_python_eval(args.res_prefix, novel=args.novel, output_dir = output_dir)
 
 

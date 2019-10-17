@@ -19,7 +19,8 @@ def valid(datacfg, darknetcfg, learnetcfg, weightfile, outfile, use_baserw=False
     ckpt = weightfile.split('/')[-1].split('.')[0]
     backup = weightfile.split('/')[-2]
     ckpt_pre = '/ene_' if use_baserw else '/ene'
-    prefix = 'results/' + backup.split('/')[-1] + ckpt_pre + ckpt
+    #prefix = 'results/' + backup.split('/')[-1] + ckpt_pre + ckpt
+    prefix = 'backup/' + backup.split('/')[-1] + ckpt_pre + ckpt
     print('saving to: ' + prefix)
     # prefix = 'results/' + weightfile.split('/')[1]
     # names = load_class_names(name_list)
@@ -92,8 +93,9 @@ def valid(datacfg, darknetcfg, learnetcfg, weightfile, outfile, use_baserw=False
             kkk += 1
             metax, mask = metax.cuda(), mask.cuda()
             metax, mask = Variable(metax, volatile=True), Variable(mask, volatile=True)
-            dws = m.meta_forward(metax, mask)
-            dw = dws[0]
+            with torch.no_grad():
+                dws = m.meta_forward(metax, mask)
+                dw = dws[0]
             for ci, c in enumerate(clsids):
                 enews[c] = enews[c] * cnt[c] / (cnt[c] + 1) + dw[ci] / (cnt[c] + 1)
                 cnt[c] += 1
@@ -136,8 +138,9 @@ def valid(datacfg, darknetcfg, learnetcfg, weightfile, outfile, use_baserw=False
     nms_thresh = 0.45
     for batch_idx, (data, target) in enumerate(valid_loader):
         data = data.cuda()
-        data = Variable(data, volatile = True)
-        output = m.detect_forward(data, dynamic_weights)
+        #data = Variable(data, volatile = True)
+        with torch.no_grad():
+            output = m.detect_forward(data, dynamic_weights)
 
         if isinstance(output, tuple):
             output = (output[0].data, output[1].data)
@@ -171,7 +174,7 @@ def valid(datacfg, darknetcfg, learnetcfg, weightfile, outfile, use_baserw=False
                     y2 = (box[1] + box[3]/2.0) * height
 
                     det_conf = box[4]
-                    for j in range((len(box)-5)/2):
+                    for j in range((len(box)-5)//2):
                         cls_conf = box[5+2*j]
                         cls_id = box[6+2*j]
                         prob =det_conf * cls_conf
